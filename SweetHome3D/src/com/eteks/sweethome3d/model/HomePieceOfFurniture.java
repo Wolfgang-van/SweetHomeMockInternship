@@ -547,6 +547,14 @@ public class HomePieceOfFurniture extends HomeObject implements PieceOfFurniture
   }
 
   /**
+   * Returns the height of this piece of furniture.
+   */
+  public float getVolume() {
+    return getWidth() * getDepth() * getHeight();
+  }
+
+
+  /**
    * Sets the height of this piece of furniture. Once this piece is updated, 
    * listeners added to this piece will receive a change notification.
    * @throws IllegalStateException if this piece of furniture isn't resizable
