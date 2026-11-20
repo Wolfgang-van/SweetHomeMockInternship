@@ -359,7 +359,15 @@ public class HomePrintableComponent extends JComponent implements Printable {
 
       try {
         if (furnitureTable != null) {
-          furnitureTable.setFurnitureFilter(null);
+          furnitureTable.setFurnitureFilter(
+                  new FurnitureTable.FurnitureFilter() {
+                    public boolean include(Home home,
+                                           HomePieceOfFurniture piece) {
+                      return piece.getLevel() == null
+                              || piece.getLevel().isViewable();
+                    }
+                  }
+          );
         }
 
         pageExists = ((Printable) furnitureView)
@@ -376,18 +384,7 @@ public class HomePrintableComponent extends JComponent implements Printable {
         this.furniturePageCount++;
       }
     }
-    if (pageExists == NO_SUCH_PAGE 
-        && planView != null 
-        && (homePrint == null || homePrint.isPlanPrinted())) {
-      // Try to print next plan view page
-      pageExists = ((Printable)planView).print(g2D, pageFormat, page - this.furniturePageCount);
-      if (pageExists == PAGE_EXISTS
-          && !this.printablePages.contains(page)) {
-        this.printablePages.add(page);
-        this.planPageCount++;
-      }
-    }
-    View view3D = this.controller.getHomeController3D().getView();
+
     if (pageExists == NO_SUCH_PAGE
             && planView != null
             && (homePrint == null || homePrint.isPlanPrinted())) {
@@ -399,6 +396,24 @@ public class HomePrintableComponent extends JComponent implements Printable {
           viewableLevels.add(level);
         }
       }
+      View view3D = this.controller.getHomeController3D().getView();
+
+      if (pageExists == NO_SUCH_PAGE
+              && view3D != null
+              && (homePrint == null || homePrint.isView3DPrinted())) {
+
+        pageExists = ((Printable)view3D).print(
+                g2D, pageFormat,
+                page - this.planPageCount - this.furniturePageCount);
+
+        if (pageExists == PAGE_EXISTS
+                && !this.printablePages.contains(page)) {
+          this.printablePages.add(page);
+        }
+      }
+
+
+
 
       int planPageIndex = page - this.furniturePageCount;
 
